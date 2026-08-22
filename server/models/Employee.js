@@ -16,6 +16,10 @@ const employeeSchema = new mongoose.Schema(
     address: String,
     about: String,
     skills: [String],
+    leaveBalances: {
+      paid: { type: Number, default: 24 },
+      sick: { type: Number, default: 7 },
+    },
   },
   { timestamps: true }
 );
