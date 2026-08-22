@@ -4,6 +4,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Clock, Briefcase, Mail, Phone, ChevronRight, User } from "lucide-react";
 import { getAllEmployees } from "../api/employees";
 import { checkIn, checkOut, getAttendance } from "../api/attendance";
+import { ProfileDisplay } from "./Profile";
+import { PayrollDisplay } from "./Payroll";
 
 const styles = {
   card: { backgroundColor: "white", borderRadius: "12px", padding: "1.5rem", boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)", border: "none" },
@@ -124,6 +126,8 @@ export default function Dashboard() {
 
   if (!user) return <div style={{ padding: "2rem" }}>Initializing...</div>;
 
+  const isAdmin = user.role && user.role.toLowerCase() === "admin";
+
   return (
     <div style={{ padding: "2rem", maxWidth: "1200px", margin: "0 auto", backgroundColor: "#f8fafc", minHeight: "calc(100vh - 70px)" }}>
       {error && (
@@ -241,58 +245,15 @@ export default function Dashboard() {
             >
               <button onClick={() => setSelectedEmp(null)} style={{ position: "absolute", top: "1rem", right: "1rem", background: "none", border: "none", fontSize: "1.5rem", cursor: "pointer", color: "#94a3b8" }}>&times;</button>
               
-              <div style={{ display: "flex", alignItems: "center", gap: "1.5rem", marginBottom: "2rem" }}>
-                <div style={{ position: "relative" }}>
-                  {selectedEmp.profilePicture ? (
-                     <img src={selectedEmp.profilePicture} alt={selectedEmp.name} style={{ width: "80px", height: "80px", borderRadius: "50%", objectFit: "cover", backgroundColor: "#f1f5f9" }} />
-                  ) : (
-                     <div style={{ width: "80px", height: "80px", borderRadius: "50%", backgroundColor: "#e2e8f0", display: "flex", alignItems: "center", justifyContent: "center", color: "#64748b" }}>
-                       <User size={40} />
-                     </div>
-                  )}
-                  <div 
-                    className={getStatusColor(selectedEmp.status)} 
-                    style={{ position: "absolute", bottom: "4px", right: "4px", width: "16px", height: "16px", borderRadius: "50%", border: "2px solid white" }} 
-                  />
-                </div>
-                <div>
-                  <h3 style={{ margin: "0 0 0.25rem 0", fontWeight: "800", color: "#0f172a", fontSize: "1.5rem" }}>{selectedEmp.name || selectedEmp.fullName}</h3>
-                  <span style={{ padding: "0.25rem 0.75rem", backgroundColor: "#f1f5f9", borderRadius: "9999px", fontSize: "0.85rem", fontWeight: "600", color: "#475569" }}>
-                    {selectedEmp.customId || selectedEmp.loginId}
-                  </span>
-                </div>
-              </div>
-
-              <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-                <div style={{ display: "flex", alignItems: "flex-start", gap: "1rem" }}>
-                  <div style={{ backgroundColor: "#f8fafc", padding: "0.5rem", borderRadius: "8px", color: "#3b82f6" }}>
-                    <Briefcase size={20} />
+              <div style={{ maxHeight: "75vh", overflowY: "auto", paddingRight: "0.5rem" }}>
+                <ProfileDisplay employee={selectedEmp} statusColor={getStatusColor(selectedEmp.status)} />
+                
+                {isAdmin && (
+                  <div style={{ marginTop: "2rem", paddingTop: "1.5rem", borderTop: "2px solid #f1f5f9" }}>
+                    <h4 style={{ margin: "0 0 1rem 0", color: "#0f172a", fontSize: "1.25rem", fontWeight: "700" }}>Salary Information</h4>
+                    <PayrollDisplay employeeId={selectedEmp._id} isSelf={false} />
                   </div>
-                  <div>
-                    <p style={{ margin: 0, fontSize: "0.75rem", textTransform: "uppercase", fontWeight: "700", color: "#94a3b8" }}>Role / Dept</p>
-                    <p style={{ margin: 0, fontWeight: "500", color: "#1e293b" }}>{selectedEmp.designation || "Employee"} • {selectedEmp.department || "General"}</p>
-                  </div>
-                </div>
-
-                <div style={{ display: "flex", alignItems: "flex-start", gap: "1rem" }}>
-                  <div style={{ backgroundColor: "#f8fafc", padding: "0.5rem", borderRadius: "8px", color: "#8b5cf6" }}>
-                    <Mail size={20} />
-                  </div>
-                  <div>
-                    <p style={{ margin: 0, fontSize: "0.75rem", textTransform: "uppercase", fontWeight: "700", color: "#94a3b8" }}>Email</p>
-                    <p style={{ margin: 0, fontWeight: "500", color: "#1e293b" }}>{selectedEmp.email}</p>
-                  </div>
-                </div>
-
-                <div style={{ display: "flex", alignItems: "flex-start", gap: "1rem" }}>
-                  <div style={{ backgroundColor: "#f8fafc", padding: "0.5rem", borderRadius: "8px", color: "#10b981" }}>
-                    <Phone size={20} />
-                  </div>
-                  <div>
-                    <p style={{ margin: 0, fontSize: "0.75rem", textTransform: "uppercase", fontWeight: "700", color: "#94a3b8" }}>Phone</p>
-                    <p style={{ margin: 0, fontWeight: "500", color: "#1e293b" }}>{selectedEmp.phone || "Not provided"}</p>
-                  </div>
-                </div>
+                )}
               </div>
               
             </motion.div>

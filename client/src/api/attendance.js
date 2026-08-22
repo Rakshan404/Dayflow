@@ -5,8 +5,9 @@ export const getAttendance = async (employeeId) => {
   return res.data;
 };
 
-export const getAdminAttendance = async () => {
-  const res = await api.get(`/attendance/today/all`);
+export const getAdminAttendance = async (dateString) => {
+  const url = dateString ? `/attendance/all?date=${dateString}` : `/attendance/all`;
+  const res = await api.get(url);
   return res.data;
 };
 

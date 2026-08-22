@@ -4,21 +4,12 @@ const { verifyToken } = require("../middleware/auth");
 const Attendance = require("../models/Attendance");
 const Employee = require("../models/Employee");
 
-// Owner: Person B
-router.get("/:employeeId", verifyToken, async (req, res) => {
+router.get("/all", verifyToken, async (req, res) => {
   try {
-    const attendance = await Attendance.find({ employeeId: req.params.employeeId }).sort({ date: -1 });
-    res.json(attendance);
-  } catch (err) {
-    res.status(500).json({ message: "Server error" });
-  }
-});
-
-router.get("/today/all", verifyToken, async (req, res) => {
-  try {
-    const startOfDay = new Date();
+    const targetDate = req.query.date ? new Date(req.query.date) : new Date();
+    const startOfDay = new Date(targetDate);
     startOfDay.setHours(0, 0, 0, 0);
-    const endOfDay = new Date();
+    const endOfDay = new Date(targetDate);
     endOfDay.setHours(23, 59, 59, 999);
 
     const attendances = await Attendance.find({
@@ -30,11 +21,23 @@ router.get("/today/all", verifyToken, async (req, res) => {
       employeeName: a.employeeId?.name || a.employeeId?.fullName || "Unknown",
       status: a.status,
       checkIn: a.checkIn || "-",
-      checkOut: a.checkOut || "-"
+      checkOut: a.checkOut || "-",
+      workHours: a.workHours || 0,
+      extraHours: a.extraHours || 0
     }));
     res.json(formatted);
   } catch (err) {
-    console.error("Error in /today/all:", err);
+    console.error("Error in /all:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+// Owner: Person B
+router.get("/:employeeId", verifyToken, async (req, res) => {
+  try {
+    const attendance = await Attendance.find({ employeeId: req.params.employeeId }).sort({ date: -1 });
+    res.json(attendance);
+  } catch (err) {
     res.status(500).json({ message: "Server error" });
   }
 });
