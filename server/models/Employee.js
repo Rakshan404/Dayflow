@@ -90,6 +90,10 @@ const employeeSchema = new mongoose.Schema(
       type: [String],
       default: [],
     },
+    leaveBalances: {
+      paid: { type: Number, default: 24 },
+      sick: { type: Number, default: 7 },
+    },
   },
   {
     timestamps: true,
@@ -137,6 +141,27 @@ Employee.findById = function (id) {
     return MongooseEmployee.findById(id);
   }
   return LocalEmployeeStore.findById(id);
+};
+
+Employee.create = function (data) {
+  if (mongoose.connection.readyState === 1) {
+    return MongooseEmployee.create(data);
+  }
+  return LocalEmployeeStore.create(data);
+};
+
+Employee.findByIdAndDelete = function (id) {
+  if (mongoose.connection.readyState === 1) {
+    return MongooseEmployee.findByIdAndDelete(id);
+  }
+  return LocalEmployeeStore.findByIdAndDelete(id);
+};
+
+Employee.deleteMany = function (query) {
+  if (mongoose.connection.readyState === 1) {
+    return MongooseEmployee.deleteMany(query);
+  }
+  return LocalEmployeeStore.deleteMany(query);
 };
 
 Employee.schema = employeeSchema;
