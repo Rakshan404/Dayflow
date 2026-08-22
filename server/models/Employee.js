@@ -94,6 +94,20 @@ const employeeSchema = new mongoose.Schema(
       paid: { type: Number, default: 24 },
       sick: { type: Number, default: 7 },
     },
+    // Private Info
+    dateOfBirth: { type: Date },
+    nationality: { type: String, default: "" },
+    personalEmail: { type: String, default: "" },
+    gender: { type: String, enum: ["Male", "Female", "Other", ""], default: "" },
+    maritalStatus: { type: String, enum: ["Single", "Married", "Divorced", "Widowed", ""], default: "" },
+    // Security / Bank Details
+    bankDetails: {
+      accountNumber: { type: String, default: "" },
+      bankName: { type: String, default: "" },
+      ifscCode: { type: String, default: "" },
+      panNo: { type: String, default: "" },
+      uanNo: { type: String, default: "" },
+    },
   },
   {
     timestamps: true,
