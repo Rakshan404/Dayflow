@@ -32,3 +32,4 @@ Runs on http://localhost:5173 (Vite proxies /api calls to the server automatical
 - `git pull origin main` after every merge to stay in sync
 
 See `SCHEMA_API_AGREEMENT.md` for the shared data models and API contract everyone builds against.
+Example changes
