@@ -2,6 +2,7 @@ import { Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbar.jsx";
 import Login from "./pages/Login.jsx";
 import Signup from "./pages/Signup.jsx";
+import AdminPortal from "./pages/AdminPortal.jsx";
 import Dashboard from "./pages/Dashboard.jsx";
 import Attendance from "./pages/Attendance.jsx";
 import Leave from "./pages/Leave.jsx";
@@ -13,7 +14,12 @@ export default function App() {
     <>
       <Routes>
         <Route path="/" element={<Login />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/admin/portal" element={<AdminPortal />} />
+        <Route path="/admin/add-employee" element={<Signup />} />
         <Route path="/signup" element={<Signup />} />
+
+
         <Route
           path="/dashboard"
           element={
