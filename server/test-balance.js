@@ -26,11 +26,12 @@ async function run() {
 
   // ── 1. Create test employee ────────────────────────────────────────
   const emp = await Employee.create({
-    loginId: "__test_balance_user__",
-    name: "Test Balance User",
-    email: "__test_balance@test.com",
-    password: "hashed_not_real",
-    leaveBalances: { paid: 24, sick: 7 },
+    customId: "__test_balance_user__",
+    fullName: "Test Balance User",
+    email: "balance@test.com",
+    password: "hashedpassword123",
+    role: "employee",
+    leaveBalances: { paid: 24, sick: 7 }
   });
   console.log("Created test employee:", emp._id.toString());
 

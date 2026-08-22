@@ -10,7 +10,7 @@ const Leave = require("../models/Leave");
 // GET /api/leave/balance — returns logged-in user's leave balances (live-computed)
 router.get("/balance", verifyToken, async (req, res) => {
   try {
-    const employee = await Employee.findById(req.user.id).select("leaveBalances");
+    const employee = await Employee.findById(req.user.id);
     if (!employee) {
       return res.status(404).json({ message: "Employee not found" });
     }
@@ -57,8 +57,8 @@ router.get("/balance", verifyToken, async (req, res) => {
 // Admin: all leaves (populated with employee name/department). Employee: own leaves only.
 router.get("/", verifyToken, async (req, res) => {
   try {
-    const filter = req.user.role === "admin" ? {} : { employeeId: req.user.id };
-
+    // Admin sees all leaves, employee sees only their own
+    const filter = req.user.role?.toLowerCase() === "admin" ? {} : { employeeId: req.user.id };
     const leaves = await Leave.find(filter)
       .populate("employeeId", "name department")
       .sort({ createdAt: -1 });

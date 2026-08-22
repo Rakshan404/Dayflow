@@ -55,16 +55,16 @@ async function run() {
 
   // ── Setup: create test employee + admin in DB ──────────────────────
   const empDoc = await Employee.create({
-    loginId: "__http_test_emp__",
-    name: "HTTP Test Employee",
+    customId: "__http_test_emp__",
+    fullName: "HTTP Test Employee",
     email: "__http_test_emp@test.com",
     password: "hashed_not_real",
     role: "employee",
   });
 
   const adminDoc = await Employee.create({
-    loginId: "__http_test_admin__",
-    name: "HTTP Test Admin",
+    customId: "__http_test_admin__",
+    fullName: "HTTP Test Admin",
     email: "__http_test_admin@test.com",
     password: "hashed_not_real",
     role: "admin",

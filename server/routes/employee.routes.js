@@ -28,15 +28,13 @@ router.put("/:id/leave-balance", verifyToken, requireAdmin, async (req, res) => 
       return res.status(400).json({ message: "paid and sick must be non-negative" });
     }
 
-    const employee = await Employee.findByIdAndUpdate(
-      req.params.id,
-      { leaveBalances: { paid, sick } },
-      { new: true, runValidators: true }
-    ).select("leaveBalances");
-
+    const employee = await Employee.findById(req.params.id);
     if (!employee) {
       return res.status(404).json({ message: "Employee not found" });
     }
+
+    employee.leaveBalances = { paid, sick };
+    await employee.save();
 
     res.json({ leaveBalances: employee.leaveBalances });
   } catch (err) {

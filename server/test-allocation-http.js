@@ -53,8 +53,8 @@ async function run() {
 
   // Setup test users
   const empDoc = await Employee.create({
-    loginId: "test_alloc_emp",
-    name: "Alloc Employee",
+    customId: "test_alloc_emp",
+    fullName: "Alloc Employee",
     email: "alloc_emp@test.com",
     password: "x",
     role: "employee",
@@ -62,8 +62,8 @@ async function run() {
   });
 
   const adminDoc = await Employee.create({
-    loginId: "test_alloc_admin",
-    name: "Alloc Admin",
+    customId: "test_alloc_admin",
+    fullName: "Alloc Admin",
     email: "alloc_adm@test.com",
     password: "x",
     role: "admin",

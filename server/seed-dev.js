@@ -8,8 +8,8 @@ const MONGO_URI = process.env.MONGO_URI;
 async function seed() {
   await mongoose.connect(MONGO_URI);
   const emp = await Employee.create({
-    loginId: "dev_user",
-    name: "Dev Employee",
+    customId: "dev_user",
+    fullName: "Dev Employee",
     email: "dev@test.com",
     password: "hashed_not_real",
     role: "employee",

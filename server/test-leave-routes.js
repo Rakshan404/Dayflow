@@ -38,15 +38,15 @@ async function run() {
 
   // ── Setup: create two test employees ───────────────────────────────
   const empA = await Employee.create({
-    loginId: "__test_routes_empA__",
-    name: "Employee A",
+    customId: "__test_routes_empA__",
+    fullName: "Employee A",
     email: "__test_routes_a@test.com",
     password: "hashed_not_real",
   });
 
   const empB = await Employee.create({
-    loginId: "__test_routes_empB__",
-    name: "Employee B",
+    customId: "__test_routes_empB__",
+    fullName: "Employee B",
     email: "__test_routes_b@test.com",
     password: "hashed_not_real",
   });

@@ -3,9 +3,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import { getLeaveBalance, getMyLeaves, createLeave, approveLeave, rejectLeave } from "../api/leave";
 import { updateLeaveBalance } from "../api/employees";
 
-// TODO: replace with real auth once Login is built
-const MOCK_TOKEN = import.meta.env.VITE_MOCK_TOKEN;
-
 // TODO: Replace this with real data fetched from GET /api/employees once Person A builds it.
 const HARDCODED_EMPLOYEES = [
   { _id: "6a89504ebaf4c650c80593a2", name: "UI Employee", paid: 24, sick: 7 }
@@ -157,18 +154,6 @@ function AdminAllocation({ onClose }) {
 }
 
 // Helper to decode JWT payload
-function parseJwt(token) {
-  try {
-    const base64Url = token.split('.')[1];
-    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-    const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
-      return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-    }).join(''));
-    return JSON.parse(jsonPayload);
-  } catch (e) {
-    return null;
-  }
-}
 
 export default function Leave() {
   const [role, setRole] = useState(null);
@@ -190,10 +175,14 @@ export default function Leave() {
   const [actionLoadingId, setActionLoadingId] = useState(null);
 
   useEffect(() => {
-    localStorage.setItem("token", MOCK_TOKEN);
-    const payload = parseJwt(MOCK_TOKEN);
-    if (payload && payload.role) {
-      setRole(payload.role);
+    const userStr = localStorage.getItem("user");
+    if (userStr) {
+      try {
+        const u = JSON.parse(userStr);
+        if (u && u.role) setRole(u.role.toLowerCase());
+      } catch (e) {
+        console.error("Failed to parse user from localStorage", e);
+      }
     }
   }, []);
 
