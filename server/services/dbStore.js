@@ -151,6 +151,7 @@ class LocalEmployeeInstance {
     this.joiningYear = data.joiningYear || new Date().getFullYear();
     this.department = data.department || "General";
     this.designation = data.designation || "Associate";
+    this.leaveBalances = data.leaveBalances || { paid: 24, sick: 7 };
     this.createdAt = data.createdAt || new Date().toISOString();
     this.updatedAt = new Date().toISOString();
   }

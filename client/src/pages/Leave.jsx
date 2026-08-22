@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { getLeaveBalance, getMyLeaves, createLeave, approveLeave, rejectLeave } from "../api/leave";
 import { updateLeaveBalance } from "../api/employees";
@@ -156,6 +157,7 @@ function AdminAllocation({ onClose }) {
 // Helper to decode JWT payload
 
 export default function Leave() {
+  const navigate = useNavigate();
   const [role, setRole] = useState(null);
   const [balances, setBalances] = useState({ paid: null, sick: null });
   const [leaves, setLeaves] = useState([]);
@@ -173,18 +175,35 @@ export default function Leave() {
 
   const [adminComments, setAdminComments] = useState({});
   const [actionLoadingId, setActionLoadingId] = useState(null);
+  const [initTimeout, setInitTimeout] = useState(false);
 
   useEffect(() => {
     const userStr = localStorage.getItem("user");
-    if (userStr) {
-      try {
-        const u = JSON.parse(userStr);
-        if (u && u.role) setRole(u.role.toLowerCase());
-      } catch (e) {
-        console.error("Failed to parse user from localStorage", e);
-      }
+    if (!userStr) {
+      navigate("/login");
+      return;
     }
-  }, []);
+    try {
+      const u = JSON.parse(userStr);
+      if (u && u.role) {
+        setRole(u.role.toLowerCase());
+      } else {
+        navigate("/login");
+      }
+    } catch (e) {
+      console.error("Failed to parse user from localStorage", e);
+      navigate("/login");
+    }
+  }, [navigate]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (!role) {
+        setInitTimeout(true);
+      }
+    }, 3000);
+    return () => clearTimeout(timer);
+  }, [role]);
 
   useEffect(() => {
     async function fetchData() {
@@ -255,6 +274,17 @@ export default function Leave() {
   };
 
   if (!role) {
+    if (initTimeout) {
+      return (
+        <div style={{ padding: "2rem", textAlign: "center" }}>
+          <h2 style={styles.h2}>Authentication Error</h2>
+          <p style={{ margin: "1rem 0" }}>We couldn't verify your session.</p>
+          <button onClick={() => navigate("/login")} style={styles.buttonPrimary}>
+            Go to Login
+          </button>
+        </div>
+      );
+    }
     return <div style={{ padding: "2rem" }}>Initializing...</div>;
   }
 
