@@ -3,9 +3,41 @@ const router = express.Router();
 const { verifyToken, requireAdmin } = require("../middleware/auth");
 const Employee = require("../models/Employee");
 
+const Attendance = require("../models/Attendance");
+
 // Owner: Person A
-router.get("/", (req, res) => {
-  res.status(501).json({ message: "list employees not implemented yet" });
+// TODO: Built this out of necessity for the Dashboard wireframe match.
+// Person A should take ownership of this moving forward!
+router.get("/", verifyToken, async (req, res) => {
+  try {
+    const employees = await Employee.MongooseModel.find({}).select("-password");
+    
+    // Get today's attendance to compute status
+    const startOfDay = new Date();
+    startOfDay.setHours(0, 0, 0, 0);
+    const endOfDay = new Date();
+    endOfDay.setHours(23, 59, 59, 999);
+    
+    const attendances = await Attendance.find({
+      date: { $gte: startOfDay, $lte: endOfDay }
+    });
+    
+    const attendanceMap = {};
+    attendances.forEach(att => {
+      attendanceMap[att.employeeId.toString()] = att.status;
+    });
+
+    const result = employees.map(emp => {
+      const empObj = emp.toObject();
+      empObj.status = attendanceMap[emp._id.toString()] || "absent";
+      return empObj;
+    });
+
+    res.json(result);
+  } catch (err) {
+    console.error("List employees error:", err);
+    res.status(500).json({ message: "Server error" });
+  }
 });
 
 router.get("/:id", (req, res) => {
