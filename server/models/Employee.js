@@ -1,23 +1,147 @@
 const mongoose = require("mongoose");
+const { LocalEmployeeInstance, LocalEmployeeStore } = require("../services/dbStore");
 
 const employeeSchema = new mongoose.Schema(
   {
-    loginId: { type: String, unique: true, required: true },
-    name: { type: String, required: true },
-    email: { type: String, unique: true, required: true },
-    password: { type: String, required: true },
-    role: { type: String, enum: ["admin", "employee"], default: "employee" },
-    phone: String,
-    department: String,
-    designation: String,
-    manager: { type: mongoose.Schema.Types.ObjectId, ref: "Employee" },
-    dateOfJoining: Date,
-    profilePicture: String,
-    address: String,
-    about: String,
-    skills: [String],
+    customId: {
+      type: String,
+      unique: true,
+      required: true,
+      trim: true,
+      index: true,
+    },
+    loginId: {
+      type: String,
+      index: true,
+    },
+    companyName: {
+      type: String,
+      default: "Odoo India",
+      trim: true,
+    },
+    companyLogo: {
+      type: String,
+      default: "",
+    },
+    fullName: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    name: {
+      type: String,
+      trim: true,
+    },
+    email: {
+      type: String,
+      unique: true,
+      required: true,
+      lowercase: true,
+      trim: true,
+      index: true,
+    },
+    phone: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+    password: {
+      type: String,
+      required: true,
+    },
+    role: {
+      type: String,
+      enum: ["Employee", "Admin", "HR", "employee", "admin", "hr"],
+      default: "Employee",
+    },
+    joiningYear: {
+      type: Number,
+      default: () => new Date().getFullYear(),
+    },
+    department: {
+      type: String,
+      default: "General",
+    },
+    designation: {
+      type: String,
+      default: "Associate",
+    },
+    manager: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Employee",
+    },
+    dateOfJoining: {
+      type: Date,
+      default: Date.now,
+    },
+    profilePicture: {
+      type: String,
+      default: "",
+    },
+    address: {
+      type: String,
+      default: "",
+    },
+    about: {
+      type: String,
+      default: "",
+    },
+    skills: {
+      type: [String],
+      default: [],
+    },
   },
-  { timestamps: true }
+  {
+    timestamps: true,
+  }
 );
 
-module.exports = mongoose.model("Employee", employeeSchema);
+// Pre-save hook to ensure loginId matches customId and name matches fullName
+employeeSchema.pre("save", function (next) {
+  if (this.customId && !this.loginId) {
+    this.loginId = this.customId;
+  }
+  if (this.fullName && !this.name) {
+    this.name = this.fullName;
+  }
+  next();
+});
+
+const MongooseEmployee = mongoose.model("Employee", employeeSchema);
+
+// Hybrid Employee constructor: uses real MongoDB if connected, or persistent JSON store otherwise
+function Employee(data) {
+  if (mongoose.connection.readyState === 1) {
+    return new MongooseEmployee(data);
+  }
+  return new LocalEmployeeInstance(data);
+}
+
+// Static methods delegator
+Employee.countDocuments = function (query) {
+  if (mongoose.connection.readyState === 1) {
+    return MongooseEmployee.countDocuments(query);
+  }
+  return LocalEmployeeStore.countDocuments(query);
+};
+
+Employee.findOne = function (query) {
+  if (mongoose.connection.readyState === 1) {
+    return MongooseEmployee.findOne(query);
+  }
+  return LocalEmployeeStore.findOne(query);
+};
+
+Employee.findById = function (id) {
+  if (mongoose.connection.readyState === 1) {
+    return MongooseEmployee.findById(id);
+  }
+  return LocalEmployeeStore.findById(id);
+};
+
+Employee.schema = employeeSchema;
+Employee.MongooseModel = MongooseEmployee;
+
+module.exports = Employee;
+
+
